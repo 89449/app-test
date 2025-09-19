@@ -1,5 +1,6 @@
 package com.app.screen
 
+import android.net.Uri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -18,6 +19,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -27,6 +34,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import android.app.Activity
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import android.content.Intent
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -42,6 +56,43 @@ fun ImageViewer(
     val context = LocalContext.current
 	var images by remember { mutableStateOf<List<Image>>(emptyList()) }
 	var isToolbarVisible by remember { mutableStateOf(true) }
+	
+	val coroutineScope = rememberCoroutineScope()
+	val deleteLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            coroutineScope.launch {
+                images = MediaLoader(context).getImageForFolder(folderId)
+            }
+        }
+    }
+
+    fun requestDeletion(item: Image) {
+        coroutineScope.launch {
+            try {
+                val intentSender = MediaLoader(context).deleteMediaItems(listOf(item.uri))
+                val request = IntentSenderRequest.Builder(intentSender).build()
+                deleteLauncher.launch(request)
+            } catch (e: Exception) {
+            
+            }
+        }
+    }
+    
+    fun getEditIntent(uri: Uri): Intent {
+        return Intent(Intent.ACTION_EDIT).apply {
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }
+    fun createShareIntent(uri: Uri): Intent {
+        return Intent(Intent.ACTION_SEND).apply {
+            type = "image/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }
 	
 	LaunchedEffect(folderId) {
 		images = MediaLoader(context).getImageForFolder(folderId)
@@ -66,13 +117,6 @@ fun ImageViewer(
         Box(
             modifier = Modifier
                 .background(Color.Black)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            isToolbarVisible = !isToolbarVisible
-                        }
-                    )
-                }
         ) {
             HorizontalPager(state = pagerState) { page ->
                 val item = images[page]
@@ -82,7 +126,7 @@ fun ImageViewer(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
-                        .zoomable(zoomState = zoomState),
+                        .zoomable(zoomState = zoomState, onTap = { isToolbarVisible = !isToolbarVisible} ),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -94,6 +138,35 @@ fun ImageViewer(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                val currentImageUri = images[pagerState.currentPage].uri
+                                val editIntent = getEditIntent(currentImageUri)
+                                context.startActivity(Intent.createChooser(editIntent, null))
+                            }
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = null)
+                        }
+                        IconButton(
+                            onClick = {
+                                val currentImageUri = images[pagerState.currentPage].uri
+                                val shareIntent = createShareIntent(currentImageUri)
+                                context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                            }
+                        ) {
+                            Icon(Icons.Filled.Share, contentDescription = null)
+                        }
+                        IconButton(
+                            onClick = {
+                                currentItem?.let { item ->
+                                    requestDeletion(item)
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = null)
+                        }
                     },
                     modifier = Modifier.align(Alignment.TopCenter)
                 )

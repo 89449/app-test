@@ -12,6 +12,7 @@ import com.app.screen.*
 @Composable
 fun Nav() {
 	val navController = rememberNavController()
+	val onBack: () -> Unit = { navController.popBackStack() }
 	NavHost(
 		navController = navController,
 		startDestination = "folder_list",
@@ -22,6 +23,9 @@ fun Nav() {
 			FolderList(
 			    onFolderClick = { folderId, folderName ->
 			        navController.navigate("folder_content/$folderId/$folderName")
+			    },
+			    onSettingsClick = {
+			    	navController.navigate("app_settings")
 			    }
 			)
 		}
@@ -43,6 +47,11 @@ fun Nav() {
 		        imageId = imageId,
 		        folderId = folderId
 		    )
+		}
+		composable("app_settings") {
+			AppSettings(
+			    onBack = onBack
+			)
 		}
 	}
 }

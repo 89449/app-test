@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.content.IntentSender
 
 data class Folder(
     val id: Long,
@@ -29,7 +30,7 @@ class MediaLoader(private val context: Context) {
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.Media.DATE_MODIFIED
+            MediaStore.Images.Media.DATE_ADDED
         )
 
         context.contentResolver.query(
@@ -37,7 +38,7 @@ class MediaLoader(private val context: Context) {
             projection,
             null,
             null,
-            "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+            "${MediaStore.Images.Media.DATE_ADDED} DESC"
         )?.use {
             cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
@@ -71,7 +72,7 @@ class MediaLoader(private val context: Context) {
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.DATE_MODIFIED
+            MediaStore.Images.Media.DATE_ADDED
         )
 
         val selection = "${MediaStore.Images.Media.BUCKET_ID} = ?"
@@ -82,7 +83,7 @@ class MediaLoader(private val context: Context) {
             projection,
             selection,
             selectionArgs,
-            "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+            "${MediaStore.Images.Media.DATE_ADDED} DESC"
         )?.use {
             cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
@@ -99,5 +100,8 @@ class MediaLoader(private val context: Context) {
             }
         }
         images
+    }
+    fun deleteMediaItems(uris: List<Uri>): IntentSender {
+        return MediaStore.createDeleteRequest(context.contentResolver, uris).intentSender
     }
 }

@@ -12,12 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.material3.Surface
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.isSystemInDarkTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -34,7 +30,7 @@ class MainActivity : ComponentActivity() {
 		    LaunchedEffect(Unit) {
 		        launcher.launch(Manifest.permission.READ_MEDIA_IMAGES)
 		    }
-		    MaterialTheme(colorScheme = if(isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
+		    AppTheme {
 		    	Surface(modifier = Modifier.fillMaxSize()) {
 		    		if(isGranted.value) Nav()
 		    	}

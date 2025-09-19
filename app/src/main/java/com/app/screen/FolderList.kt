@@ -16,6 +16,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,14 +33,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.res.stringResource
+import com.app.R
 import com.app.data.Folder
 import com.app.data.MediaLoader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderList(
-    onFolderClick: (Long, String) -> Unit
+    onFolderClick: (Long, String) -> Unit,
+    onSettingsClick: () -> Unit
 ) {
 	val context = LocalContext.current
 	var folders by remember { mutableStateOf<List<Folder>>(emptyList()) }
@@ -46,30 +56,43 @@ fun FolderList(
 	}
 	Column {
 		TopAppBar(
-			title = { Text("Folders") }
+			title = { Text(stringResource(R.string.folders_title)) },
+			actions = {
+			    IconButton(onClick =  onSettingsClick ) {
+			        Icon(Icons.Filled.Settings, contentDescription = null)
+			    }
+			}
 		)
 		LazyVerticalGrid(GridCells.Adaptive(180.dp)) {
 			items(folders) {
 				Column(
 					modifier = Modifier
-						.padding(2.dp)
+						.padding(8.dp)
 						.clickable { onFolderClick(it.id, it.name)}
 				) {
 					AsyncImage(
 						model = it.thumbnailUri,
 						contentDescription = null,
 						modifier = Modifier
-							.aspectRatio(1f),
+							.aspectRatio(1f)
+							.clip(RoundedCornerShape(16.dp)),
 						contentScale = ContentScale.Crop
 					)
-					Text(
-						text = it.name,
-						style = MaterialTheme.typography.titleMedium
-					)
-					Text(
-						text = it.count.toString(),
-						style = MaterialTheme.typography.bodySmall
-					)
+					Column(modifier = Modifier.padding(4.dp)) {
+					    Text(
+    						text = it.name,
+    						maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+    						style = MaterialTheme.typography.titleMedium
+    					)
+    					Text(
+    						text = it.count.toString(),
+    						maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+    						style = MaterialTheme.typography.bodyMedium
+    					)
+					}
 				}
 			}
 		}
