@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import android.content.Intent
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.widget.Toast
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -59,26 +60,14 @@ fun ImageViewer(
     val context = LocalContext.current
 	var isToolbarVisible by remember { mutableStateOf(true) }
 	
-	val coroutineScope = rememberCoroutineScope()
 	val deleteLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            coroutineScope.launch {
-                viewModel.loadImages(context, folderId)
-            }
-        }
-    }
-
-    fun requestDeletion(item: Image) {
-        coroutineScope.launch {
-            try {
-                val intentSender = MediaLoader(context).deleteMediaItems(listOf(item.uri))
-                val request = IntentSenderRequest.Builder(intentSender).build()
-                deleteLauncher.launch(request)
-            } catch (e: Exception) {
-            
-            }
+            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+            viewModel.loadImages(context, folderId)
+        } else {
+            Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -157,7 +146,7 @@ fun ImageViewer(
                             onClick = {
                                 val currentImageUri = images[pagerState.currentPage].uri
                                 val shareIntent = createShareIntent(currentImageUri)
-                                context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                                context.startActivity(Intent.createChooser(shareIntent, null))
                             }
                         ) {
                             Icon(Icons.Filled.Share, contentDescription = null)
@@ -165,7 +154,13 @@ fun ImageViewer(
                         IconButton(
                             onClick = {
                                 currentItem?.let { item ->
-                                    requestDeletion(item)
+                                    try {
+                                        val intentSender = MediaLoader(context).deleteMediaItems(listOf(item.uri))
+                                        val request = IntentSenderRequest.Builder(intentSender).build()
+                                        deleteLauncher.launch(request)
+                                    } catch (e: Exception) {
+                                    
+                                    }
                                 }
                             }
                         ) {

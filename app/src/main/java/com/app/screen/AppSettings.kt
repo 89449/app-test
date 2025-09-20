@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.app.R
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,13 +24,19 @@ fun AppSettings(
 ) {
     val context = LocalContext.current
     Column {
-        TopAppBar(
-            title = { Text(stringResource(R.string.settings_title)) },
+        LargeTopAppBar(
+            title = { },
             navigationIcon = {
-                IconButton(onClick = onBack) {
+                FilledTonalIconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
             }
+        )
+        Text(
+            text = "Appearance",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
         )
         Card(
             modifier = Modifier
@@ -41,11 +48,19 @@ fun AppSettings(
                     context.startActivity(intent)
                 }
         ) {
-            Text(
-                text = stringResource(R.string.language_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.language_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import com.app.data.MediaLoader
 import com.app.viewmodel.FolderContentViewModel
+import android.widget.Toast
 
 import android.util.Log
 
@@ -72,51 +74,47 @@ fun FolderContent(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
+            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
             viewModel.loadImages(context, folderId)
+            viewModel.toggleSelectionMode()
+        } else {
+            Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
         }
-        viewModel.toggleSelectionMode()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = if (isSelectionMode) selectedItemIds.size.toString() else folderName,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                navigationIcon = {
-                    if (isSelectionMode) {
-                        IconButton(onClick = { viewModel.toggleSelectionMode() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                },
-                actions = {
-                    if (isSelectionMode) {
-                        IconButton(
-                            onClick = {
-                                val selectedUris = images
-                                    .filter { it.id in selectedItemIds }
-                                    .map { it.uri }
-                                if (selectedUris.isNotEmpty()) {
-                                    val intentSender = MediaLoader(context).deleteMediaItems(selectedUris)
-                                    deleteLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
-                                }
+    Column {
+        TopAppBar(
+            title = {
+                Text(
+                    text = if (isSelectionMode) selectedItemIds.size.toString() else folderName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            navigationIcon = {
+                
+            },
+            actions = {
+                if (isSelectionMode) {
+                    IconButton(
+                        onClick = {
+                            val selectedUris = images
+                                .filter { it.id in selectedItemIds }
+                                .map { it.uri }
+                            if (selectedUris.isNotEmpty()) {
+                                val intentSender = MediaLoader(context).deleteMediaItems(selectedUris)
+                                val request = IntentSenderRequest.Builder(intentSender).build()
+                                deleteLauncher.launch(request)
                             }
-                        ) {
-                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
                         }
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
                     }
                 }
-            )
-        }
-    ) { paddingValues ->
+            }
+        )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(120.dp),
-            modifier = Modifier.padding(paddingValues)
+            columns = GridCells.Adaptive(120.dp)
         ) {
             items(images) { image ->
                 val isSelected = selectedItemIds.contains(image.id)
