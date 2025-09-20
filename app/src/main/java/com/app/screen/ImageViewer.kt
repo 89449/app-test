@@ -41,20 +41,22 @@ import android.app.Activity
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import android.content.Intent
+import androidx.lifecycle.viewmodel.compose.viewModel
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
 import com.app.data.Image
 import com.app.data.MediaLoader
+import com.app.viewmodel.FolderContentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageViewer(
     imageId: Long,
-    folderId: Long
+    folderId: Long,
+    viewModel: FolderContentViewModel = viewModel()
 ) {
     val context = LocalContext.current
-	var images by remember { mutableStateOf<List<Image>>(emptyList()) }
 	var isToolbarVisible by remember { mutableStateOf(true) }
 	
 	val coroutineScope = rememberCoroutineScope()
@@ -63,7 +65,7 @@ fun ImageViewer(
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             coroutineScope.launch {
-                images = MediaLoader(context).getImageForFolder(folderId)
+                viewModel.loadImages(context, folderId)
             }
         }
     }
@@ -94,8 +96,10 @@ fun ImageViewer(
         }
     }
 	
+	val images = viewModel.images.value
+	
 	LaunchedEffect(folderId) {
-		images = MediaLoader(context).getImageForFolder(folderId)
+		viewModel.loadImages(context, folderId)
 	}
 	
 	LaunchedEffect(isToolbarVisible) {

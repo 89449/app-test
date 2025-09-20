@@ -22,7 +22,7 @@ data class Image(
 )
 
 class MediaLoader(private val context: Context) {
-    suspend fun getImageFolder(): List<Folder> = withContext(Dispatchers.IO) {
+    suspend fun getImageFolder(): List<Folder> {
         val folders = mutableMapOf<Long, Folder>()
         val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
@@ -62,10 +62,10 @@ class MediaLoader(private val context: Context) {
                 }
             }
         }
-        folders.values.toList()
+        return folders.values.toList()
     }
 
-    suspend fun getImageForFolder(folderId: Long): List<Image> = withContext(Dispatchers.IO) {
+    suspend fun getImageForFolder(folderId: Long): List<Image> {
         val images = mutableListOf<Image>()
         val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
@@ -99,7 +99,7 @@ class MediaLoader(private val context: Context) {
                 images.add(Image(id, name, contentUri))
             }
         }
-        images
+        return images
     }
     fun deleteMediaItems(uris: List<Uri>): IntentSender {
         return MediaStore.createDeleteRequest(context.contentResolver, uris).intentSender

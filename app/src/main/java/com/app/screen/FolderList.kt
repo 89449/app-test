@@ -38,22 +38,30 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.R
 import com.app.data.Folder
 import com.app.data.MediaLoader
+import com.app.viewmodel.FolderViewModel
+
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderList(
     onFolderClick: (Long, String) -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    viewModel: FolderViewModel = viewModel()
 ) {
 	val context = LocalContext.current
-	var folders by remember { mutableStateOf<List<Folder>>(emptyList()) }
 	
 	LaunchedEffect(Unit) {
-		folders = MediaLoader(context).getImageFolder()
+		viewModel.loadFolders(context)
 	}
+	
+	val folders = viewModel.folders.value
+	
+	
 	Column {
 		TopAppBar(
 			title = { Text(stringResource(R.string.folders_title)) },
