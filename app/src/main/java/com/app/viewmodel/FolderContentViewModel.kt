@@ -43,4 +43,12 @@ class FolderContentViewModel : ViewModel() {
             isSelectionMode.value = false
         }
     }
+    
+    fun clearSelection() {
+    selectedItemIds.value = emptySet()
+	}
+
+	fun setSelection(ids: Set<Long>) {
+	    selectedItemIds.value = ids
+	}
 }

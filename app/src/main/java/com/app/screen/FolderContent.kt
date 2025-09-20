@@ -96,6 +96,18 @@ fun FolderContent(
             },
             actions = {
                 if (isSelectionMode) {
+                    FilledTonalButton(
+                        onClick = {
+                            if (selectedItemIds.size == images.size) {
+                                viewModel.clearSelection()
+                            } else {
+                                val allImageIds = images.map { it.id }.toSet()
+                                viewModel.setSelection(allImageIds)
+                            }
+                        }
+                    ) {
+                        Text(if(selectedItemIds.size == images.size) "Deselect All" else "Select All")
+                    }
                     IconButton(
                         onClick = {
                             val selectedUris = images
