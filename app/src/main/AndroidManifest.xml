@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <application
+    	android:name=".App"
     	android:localeConfig="@xml/locales_config"
         android:allowBackup="true"
         android:enableOnBackInvokedCallback="true"
