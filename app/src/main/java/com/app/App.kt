@@ -12,9 +12,7 @@ import okio.Path.Companion.toOkioPath
 class App : Application(), SingletonImageLoader.Factory {
     override fun newImageLoader(context: Context): ImageLoader {
         return ImageLoader.Builder(context)
-            .components {
-                add(ImageLoader.crossfade(true))
-            }
+            .crossfade(true)
             .memoryCache {
                 MemoryCache.Builder()
                     .maxSizePercent(context, 0.25)
