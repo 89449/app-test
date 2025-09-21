@@ -73,12 +73,19 @@ fun FolderContent(
     val deleteLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-            viewModel.loadImages(context, folderId)
-            viewModel.toggleSelectionMode()
-        } else {
-            Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+        when(result.resultCode) {
+            Activity.RESULT_OK -> {
+                val deletedCount = selectedItemIds.size
+                Toast.makeText(context, if (deletedCount == 1) "Image deleted" else "$deletedCount images deleted", Toast.LENGTH_SHORT).show()
+                viewModel.loadImages(context, folderId)
+                viewModel.toggleSelectionMode()
+            }
+            Activity.RESULT_CANCELED -> {
+                
+            }
+            else -> {
+                Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -86,7 +93,7 @@ fun FolderContent(
         TopAppBar(
             title = {
                 Text(
-                    text = if (isSelectionMode) selectedItemIds.size.toString() else folderName,
+                    text = if(isSelectionMode) "" else folderName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -108,7 +115,7 @@ fun FolderContent(
                     ) {
                         Text(if(selectedItemIds.size == images.size) "Deselect All" else "Select All")
                     }
-                    IconButton(
+                    TextButton(
                         onClick = {
                             val selectedUris = images
                                 .filter { it.id in selectedItemIds }
@@ -118,9 +125,10 @@ fun FolderContent(
                                 val request = IntentSenderRequest.Builder(intentSender).build()
                                 deleteLauncher.launch(request)
                             }
-                        }
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                        Text("Delete (${selectedItemIds.size})")
                     }
                 }
             }

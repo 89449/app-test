@@ -3,11 +3,13 @@ package com.app.screen
 import android.net.Uri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -46,7 +49,8 @@ import net.engawapg.lib.zoomable.zoomable
 import com.app.data.Image
 import com.app.data.MediaLoader
 import com.app.viewmodel.FolderContentViewModel
-import com.app.data.utils.ImageUtils
+import com.app.utils.ImageUtils
+import com.app.utils.CopiableText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,11 +66,17 @@ fun ImageViewer(
 	val deleteLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-            viewModel.loadImages(context, folderId)
-        } else {
-            Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+        when(result.resultCode) {
+            Activity.RESULT_OK -> {
+                Toast.makeText(context, "Image deleted", Toast.LENGTH_SHORT).show()
+                viewModel.loadImages(context, folderId)
+            }
+            Activity.RESULT_CANCELED -> {
+                
+            }
+            else -> {
+                Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
     
@@ -174,26 +184,30 @@ fun ImageViewer(
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
-            
-            if(showInfoDialog) {
-                AlertDialog(
-                    onDismissRequest = { showInfoDialog = false },
-                    title = { Text("${currentItem.name}") },
-                    text = {
-                        Column {
-                            Text(text = "Size: ${ImageUtils.formatSize(currentItem.size)}")
-                            Text(text = "Dimensions: ${currentItem.width} x ${currentItem.height}")
-                            Text(text = "Type: ${currentItem.imageType}")
-                            Text(text = "Added: ${ImageUtils.formatTimeAgo(currentItem.dateAdded)} ${ImageUtils.formatDate(currentItem.dateAdded)}")
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showInfoDialog = false }) {
-                            Text("OK")
-                        }
+        }
+        if(showInfoDialog) {
+            AlertDialog(
+                onDismissRequest = { showInfoDialog = false },
+                title = {
+                    
+                },
+                text = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        CopiableText(label = "File name: ", value = currentItem.name)
+                        CopiableText(label = "File type: ", value = currentItem.imageType)
+                        CopiableText(label = "File size: ", value = ImageUtils.formatSize(currentItem.size))
+                        CopiableText(label = "Resolution: ", value = "${currentItem.width} x ${currentItem.height}")
+                        CopiableText(label = "Date added: ", value = "${ImageUtils.formatTimeAgo(currentItem.dateAdded)} on ${ImageUtils.formatDate(currentItem.dateAdded)}")
                     }
-                )
-            }
+                },
+                confirmButton = {
+                    FilledTonalButton(onClick = { showInfoDialog = false }) {
+                        Text("OK")
+                    }
+                }
+            )
         }
 	} 
 }
