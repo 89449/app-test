@@ -2,10 +2,10 @@ package com.app
 
 import android.app.Application
 import android.content.Context
-import coil.ImageLoader
-import coil.SingletonImageLoader
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.disk.DiskCache
+import coil3.memory.MemoryCache
 
 class App : Application(), SingletonImageLoader.Factory {
     override fun newImageLoader(context: Context): ImageLoader {
