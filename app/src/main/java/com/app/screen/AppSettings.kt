@@ -1,66 +1,73 @@
 package com.app.screen
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.app.R
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSettings(
     onBack: () -> Unit
 ) {
-    val context = LocalContext.current
-    Column {
-        LargeTopAppBar(
-            title = { },
-            navigationIcon = {
-                FilledTonalIconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
+                    }
                 }
-            }
-        )
-        Text(
-            text = "Appearance",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-        )
-        Card(
+            )
+        }
+    ) { innerPadding ->
+        val context = LocalContext.current
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .clickable {
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp)
+                .fillMaxSize()
+        ) {
+            // Language setting
+            ListItem(
+                headlineContent = { Text("Language") },
+                trailingContent = {
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                },
+                modifier = Modifier.clickable { 
                     val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS)
                     intent.data = Uri.fromParts("package", context.packageName, null)
                     context.startActivity(intent)
                 }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.language_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-            }
+            )
+            
+            // Show hidden folders setting
+            ListItem(
+                headlineContent = { Text("Show hidden folders") },
+                trailingContent = {
+                    var checked by remember { mutableStateOf(false) }
+                    Switch(checked = checked, onCheckedChange = { checked = it })
+                }
+            )
+            
+            // Dark mode setting
+            ListItem(
+                headlineContent = { Text("Use device theme color") },
+                trailingContent = {
+                    var themeChecked by remember { mutableStateOf(false) }
+                    Switch(checked = themeChecked, onCheckedChange = { themeChecked = it })
+                }
+            )
         }
     }
 }

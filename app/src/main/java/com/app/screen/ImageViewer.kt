@@ -6,6 +6,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -15,16 +16,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Icon
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -49,6 +46,7 @@ import net.engawapg.lib.zoomable.zoomable
 import com.app.data.Image
 import com.app.data.MediaLoader
 import com.app.viewmodel.FolderContentViewModel
+import com.app.data.utils.ImageUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +57,7 @@ fun ImageViewer(
 ) {
     val context = LocalContext.current
 	var isToolbarVisible by remember { mutableStateOf(true) }
+	var showInfoDialog by remember { mutableStateOf(false) }
 	
 	val deleteLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
@@ -134,6 +133,11 @@ fun ImageViewer(
                     },
                     actions = {
                         IconButton(
+                            onClick = { showInfoDialog = true }
+                        ) {
+                            Icon(Icons.Filled.Info, contentDescription = null)
+                        }
+                        IconButton(
                             onClick = {
                                 val currentImageUri = images[pagerState.currentPage].uri
                                 val editIntent = getEditIntent(currentImageUri)
@@ -168,6 +172,26 @@ fun ImageViewer(
                         }
                     },
                     modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
+            
+            if(showInfoDialog) {
+                AlertDialog(
+                    onDismissRequest = { showInfoDialog = false },
+                    title = { Text("${currentItem.name}") },
+                    text = {
+                        Column {
+                            Text(text = "Size: ${ImageUtils.formatSize(currentItem.size)}")
+                            Text(text = "Dimensions: ${currentItem.width} x ${currentItem.height}")
+                            Text(text = "Type: ${currentItem.imageType}")
+                            Text(text = "Added: ${ImageUtils.formatTimeAgo(currentItem.dateAdded)} ${ImageUtils.formatDate(currentItem.dateAdded)}")
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showInfoDialog = false }) {
+                            Text("OK")
+                        }
+                    }
                 )
             }
         }

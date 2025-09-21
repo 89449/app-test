@@ -64,12 +64,7 @@ fun FolderList(
 	
 	Column {
 		TopAppBar(
-			title = { Text(stringResource(R.string.folders_title)) },
-			actions = {
-			    IconButton(onClick =  onSettingsClick ) {
-			        Icon(Icons.Filled.Settings, contentDescription = null)
-			    }
-			}
+			title = { Text(stringResource(R.string.folders_title)) }
 		)
 		LazyVerticalGrid(GridCells.Adaptive(180.dp)) {
 			items(folders) {
