@@ -60,7 +60,7 @@ fun ImageViewer(
     viewModel: FolderContentViewModel = viewModel()
 ) {
     val context = LocalContext.current
-	var isToolbarVisible by remember { mutableStateOf(true) }
+	var isToolbarVisible by remember { mutableStateOf(false) }
 	var showInfoDialog by remember { mutableStateOf(false) }
 	
 	val deleteLauncher = rememberLauncherForActivityResult(

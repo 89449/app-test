@@ -30,13 +30,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.input.ImeAction // For ImeAction
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
 import coil3.compose.AsyncImage
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.BackHandler
 import com.app.R
 import com.app.data.Folder
 import com.app.data.MediaLoader
@@ -53,7 +54,7 @@ fun FolderList(
 ) {
 	val context = LocalContext.current
 	
-	var active by remember { mutableStateOf(false) }
+	var expanded by remember { mutableStateOf(false) }
 	var searchQuery by remember { mutableStateOf("") }
 	
 	LaunchedEffect(Unit) {
@@ -71,17 +72,49 @@ fun FolderList(
                 it.name.contains(searchQuery, ignoreCase = true) 
             }
         }
+    } 
+    BackHandler(enabled = expanded) {
+        searchQuery = ""
+        expanded = false
     }
 	
 	Scaffold(
 	    topBar = {
-	        DockedSearchBar(
-	            query = searchQuery,
-	            onQueryChange = { searchQuery = it },
-	            onSearch = { },
-	            active = false,
-                onActiveChange = { }
-	        ) {}
+	        SearchBar(
+	            modifier = Modifier
+	                .fillMaxWidth()
+	                .padding(horizontal = 16.dp),
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        onSearch = {
+                            expanded = false
+                        },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        placeholder = { Text("Search") },
+                        leadingIcon = {
+                            Icon(Icons.Filled.Search, contentDescription = null)
+                        },
+                        trailingIcon = {
+                            if(expanded) {
+                                IconButton(
+                                    onClick = {
+                                        searchQuery = ""
+                                        expanded = false
+                                    }
+                                ) {
+                                    Icon(Icons.Filled.Close, contentDescription = null)
+                                }
+                            }
+                        }
+                    )
+                },
+            expanded = false,
+            onExpandedChange = { },
+            content = {}
+	        )
 	    }
 	) {
 	    LazyVerticalGrid(
