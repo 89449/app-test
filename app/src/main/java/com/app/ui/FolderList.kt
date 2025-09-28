@@ -78,9 +78,9 @@ fun FolderList(
 	        DockedSearchBar(
 	            query = searchQuery,
 	            onQueryChange = { searchQuery = it },
-	            onSearch = { active = false },
-	            active = active,
-                onActiveChange = { active = it }
+	            onSearch = { },
+	            active = false,
+                onActiveChange = { }
 	        ) {}
 	    }
 	) {
