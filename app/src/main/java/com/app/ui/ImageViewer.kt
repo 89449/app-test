@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
@@ -57,6 +58,7 @@ import com.app.utils.CopiableText
 fun ImageViewer(
     imageId: Long,
     folderId: Long,
+    onBack: () -> Unit,
     viewModel: FolderContentViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -180,6 +182,11 @@ fun ImageViewer(
                         ) {
                             Icon(Icons.Filled.Delete, contentDescription = null)
                         }
+                    },
+                    navigationIcon = {
+                    	IconButton(onClick = onBack) {
+                    		Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    	}
                     },
                     modifier = Modifier.align(Alignment.TopCenter)
                 )

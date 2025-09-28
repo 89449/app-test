@@ -37,7 +37,8 @@ fun Nav() {
 		        folderName = folderName,
 		        onImageClick = { imageId ->
 		            navController.navigate("image_viewer/$imageId/$folderId")
-		        }
+		        },
+		        onBack = onBack
 		    )
 		}
 		composable("image_viewer/{imageId}/{folderId}") {
@@ -45,7 +46,8 @@ fun Nav() {
 		    val folderId = it.arguments!!.getString("folderId")!!.toLong()
 		    ImageViewer(
 		        imageId = imageId,
-		        folderId = folderId
+		        folderId = folderId,
+		        onBack = onBack
 		    )
 		}
 		composable("app_settings") {

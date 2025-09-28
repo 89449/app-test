@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -50,6 +51,7 @@ fun FolderContent(
     folderId: Long,
     folderName: String,
     onImageClick: (Long) -> Unit,
+    onBack: () -> Unit,
     viewModel: FolderContentViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -93,17 +95,19 @@ fun FolderContent(
         TopAppBar(
             title = {
                 Text(
-                    text = if(isSelectionMode) "" else folderName,
+                    text = folderName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             },
             navigationIcon = {
-                
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                }
             },
             actions = {
                 if (isSelectionMode) {
-                    FilledTonalButton(
+                    IconButton(
                         onClick = {
                             if (selectedItemIds.size == images.size) {
                                 viewModel.clearSelection()
@@ -113,9 +117,9 @@ fun FolderContent(
                             }
                         }
                     ) {
-                        Text(if(selectedItemIds.size == images.size) "Deselect All" else "Select All")
+                        Icon(Icons.Filled.SelectAll, contentDescription = null)
                     }
-                    TextButton(
+                    IconButton(
                         onClick = {
                             val selectedUris = images
                                 .filter { it.id in selectedItemIds }
@@ -126,9 +130,9 @@ fun FolderContent(
                                 deleteLauncher.launch(request)
                             }
                         },
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                        
                     ) {
-                        Text("Delete (${selectedItemIds.size})")
+                        Icon(Icons.Filled.Delete, contentDescription = null)
                     }
                 }
             }

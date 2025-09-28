@@ -89,7 +89,7 @@ fun FolderList(
                         query = searchQuery,
                         onQueryChange = { searchQuery = it },
                         onSearch = {
-                            expanded = false
+                            
                         },
                         expanded = expanded,
                         onExpandedChange = { expanded = it },
