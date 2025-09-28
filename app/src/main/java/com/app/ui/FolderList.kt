@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.ImeAction // For ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.stringResource
@@ -81,7 +81,7 @@ fun FolderList(
 	            onSearch = { active = false },
 	            active = active,
                 onActiveChange = { active = it }
-	        )
+	        ) {}
 	    }
 	) {
 	    LazyVerticalGrid(
