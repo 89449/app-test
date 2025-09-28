@@ -1,4 +1,4 @@
-package com.app.screen
+package com.app.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -35,7 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.draw.scale
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import com.app.data.MediaLoader

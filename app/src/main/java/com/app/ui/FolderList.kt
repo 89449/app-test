@@ -1,4 +1,4 @@
-package com.app.screen
+package com.app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,14 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Icon
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +30,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
-import coil3.compose.AsyncImage
+import androidx.compose.ui.text.input.ImeAction // For ImeAction
+import androidx.compose.foundation.text.KeyboardOptions
+import coil.compose.AsyncImage
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.stringResource
@@ -55,6 +53,9 @@ fun FolderList(
 ) {
 	val context = LocalContext.current
 	
+	var active by remember { mutableStateOf(false) }
+	var searchQuery by remember { mutableStateOf("") }
+	
 	LaunchedEffect(Unit) {
 		viewModel.loadFolders(context)
 	}
@@ -62,12 +63,32 @@ fun FolderList(
 	val folders = viewModel.folders.value
 	
 	
-	Column {
-		TopAppBar(
-			title = { Text(stringResource(R.string.folders_title)) }
-		)
-		LazyVerticalGrid(GridCells.Adaptive(180.dp)) {
-			items(folders) {
+	val filteredFolders = remember(folders, searchQuery) {
+        if (searchQuery.isBlank()) {
+            folders
+        } else {
+            folders.filter { 
+                it.name.contains(searchQuery, ignoreCase = true) 
+            }
+        }
+    }
+	
+	Scaffold(
+	    topBar = {
+	        DockedSearchBar(
+	            query = searchQuery,
+	            onQueryChange = { searchQuery = it },
+	            onSearch = { active = false },
+	            active = active,
+                onActiveChange = { active = it }
+	        )
+	    }
+	) {
+	    LazyVerticalGrid(
+    	    GridCells.Adaptive(180.dp),
+    	    contentPadding = it
+	    ) {
+			items(filteredFolders) {
 				Column(
 					modifier = Modifier
 						.padding(8.dp)

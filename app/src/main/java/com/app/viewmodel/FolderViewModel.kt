@@ -20,4 +20,5 @@ class FolderViewModel : ViewModel() {
             folders.value = loadedFolders
         }
     }
+    
 }

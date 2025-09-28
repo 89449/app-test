@@ -7,7 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 
-import com.app.screen.*
+import com.app.ui.*
 
 @Composable
 fun Nav() {

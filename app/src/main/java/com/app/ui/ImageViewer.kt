@@ -1,4 +1,4 @@
-package com.app.screen
+package com.app.ui
 
 import android.net.Uri
 import androidx.core.view.WindowCompat
@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -189,7 +189,7 @@ fun ImageViewer(
             AlertDialog(
                 onDismissRequest = { showInfoDialog = false },
                 title = {
-                    
+                    Text("File Details")
                 },
                 text = {
                     Column(
@@ -203,7 +203,7 @@ fun ImageViewer(
                     }
                 },
                 confirmButton = {
-                    FilledTonalButton(onClick = { showInfoDialog = false }) {
+                    TextButton(onClick = { showInfoDialog = false }) {
                         Text("OK")
                     }
                 }

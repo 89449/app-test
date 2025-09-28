@@ -1,4 +1,4 @@
-package com.app
+package com.app.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
